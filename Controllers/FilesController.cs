@@ -24,10 +24,10 @@ namespace UpDownFiles.Controllers
         [HttpPost("upload")]
         //[DisableRequestSizeLimit] //禁用http限制大小
         [RequestSizeLimit(100 * 1024 * 1024)] //限制http大小
-        public void UploadFile(List<IFormFile> files, string subDirectory)
+        public async Task<string> UploadFile(List<IFormFile> files, string subDirectory)
         {
             subDirectory = subDirectory ?? string.Empty;
-            var target = Path.Combine(_hostingEnvironment.ContentRootPath, subDirectory);
+            var target = Path.Combine(_hostingEnvironment.ContentRootPath + "\\附件", subDirectory);
 
             Directory.CreateDirectory(target);
 
@@ -40,6 +40,7 @@ namespace UpDownFiles.Controllers
                     await file.CopyToAsync(stream);
                 }
             });
+            return "上传成功";
         }
 
 
@@ -48,7 +49,7 @@ namespace UpDownFiles.Controllers
         {
             try
             {
-                var addrUrl = Path.Combine(_hostingEnvironment.ContentRootPath, $@"{id + "\\" + fileName}");
+                var addrUrl = Path.Combine(_hostingEnvironment.ContentRootPath + "\\附件", $@"{id + "\\" + fileName}");
                 FileStream fs = new FileStream(addrUrl, FileMode.Open);
                 return File(fs, "application/vnd.android.package-archive", fileName);
 
@@ -56,6 +57,20 @@ namespace UpDownFiles.Controllers
             catch (Exception ex)
             {
                 return NotFound();
+            }
+        }
+        [HttpGet("delete")]
+        public async Task<int> delete(string id, string fileName)
+        {
+            try
+            {
+                var addrUrl = Path.Combine(_hostingEnvironment.ContentRootPath + "\\附件", $@"{id + "\\" + fileName}");
+                Directory.Delete(addrUrl, true);
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                return 1;
             }
         }
     }
