@@ -23,7 +23,7 @@ namespace UpDownFiles.Controllers
         /// <param name="subDirectory"></param>
         [HttpPost("upload")]
         //[DisableRequestSizeLimit] //禁用http限制大小
-        [RequestSizeLimit(100 * 1024 * 1024)] //限制http大小
+        [RequestSizeLimit(1000 * 1024 * 1024)] //限制http大小
         public async Task<string> UploadFile(List<IFormFile> files, string subDirectory)
         {
             subDirectory = subDirectory ?? string.Empty;
@@ -31,15 +31,16 @@ namespace UpDownFiles.Controllers
 
             Directory.CreateDirectory(target);
 
-            files.ForEach(async file =>
+            files.ForEach(file =>
             {
                 if (file.Length <= 0) return;
                 var filePath = Path.Combine(target, file.FileName);
                 using (var stream = new FileStream(filePath, FileMode.Create))
                 {
-                    await file.CopyToAsync(stream);
+                    file.CopyTo(stream);
                 }
             });
+            
             return "上传成功";
         }
 
