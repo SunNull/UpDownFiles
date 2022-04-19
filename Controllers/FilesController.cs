@@ -65,7 +65,7 @@ namespace UpDownFiles.Controllers
             try
             {
                 var addrUrl = Path.Combine(_hostingEnvironment.ContentRootPath + "\\附件", $@"{id + "\\" + fileName}");
-                Directory.Delete(addrUrl, true);
+                System.IO.File.Delete(addrUrl);
                 return 0;
             }
             catch (Exception ex)
